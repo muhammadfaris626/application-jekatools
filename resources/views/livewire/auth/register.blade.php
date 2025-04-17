@@ -36,7 +36,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
         $referrer = User::where('referral_code', $validated['referral_code'])->first();
 
         $validated['referral_code'] = Str::random(8);
-        $validated['referred_by'] = $referrer->referral_code;
+        $validated['referred_by'] = $referrer?->referral_code;
 
         event(new Registered(($user = User::create($validated))));
 
