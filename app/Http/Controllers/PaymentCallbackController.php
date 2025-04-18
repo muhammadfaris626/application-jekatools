@@ -87,12 +87,12 @@ class PaymentCallbackController extends Controller
                     ]);
 
                     $yangDapatBonus = User::where('referral_code', $transaction->user->referred_by)->first();
+                    dd($yangDapatBonus);
                     ReferralBonus::create([
                         'user_id' => $yangDapatBonus->id,
                         'referred_user_id' => $transaction->user_id,
                         'amount' => $transaction->amount * 0.10
                     ]);
-                    dd(1);
 
                     break;
 
