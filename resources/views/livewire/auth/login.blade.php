@@ -17,15 +17,33 @@ new #[Layout('components.layouts.auth')] class extends Component {
 
     #[Validate('required|string')]
     public string $password = '';
+    public string $captcha = '';
+    public string $captcha_image = '';
 
     public bool $remember = false;
 
     /**
      * Handle an incoming authentication request.
      */
+
+    public function refreshCaptcha()
+    {
+        $this->captcha_image = captcha_img();
+    }
+
     public function login(): void
     {
-        $this->validate();
+        $this->validate([
+            'email' => 'required|string|email',
+            'password' => 'required',
+            'captcha' => 'required|captcha'
+        ], [
+            'email.required' => 'Kolom email wajib diisi.',
+            'email.email' => 'Harap gunakan format email yang benar.',
+            'password.required' => 'Kolom kata sandi wajib diisi.',
+            'captcha.captcha' => 'Captcha tidak sesuai.',
+            'captcha.required' => 'Captcha wajib diisi.'
+        ]);
 
         $this->ensureIsNotRateLimited();
 
@@ -80,47 +98,74 @@ new #[Layout('components.layouts.auth')] class extends Component {
     <x-auth-session-status class="text-center" :status="session('status')" />
 
     <form wire:submit="login" class="flex flex-col gap-6">
-        <!-- Email Address -->
-        <flux:input
-            wire:model="email"
-            :label="__('Email')"
-            type="email"
-            {{-- required --}}
-            autofocus
-            autocomplete="email"
-            placeholder="email@example.com"
-        />
+        <div class="grid grid-cols-3 gap-2">
+            <div class="col-start-2">
+                <flux:input
+                    wire:model="email"
+                    :label="__('Email')"
+                    type="email"
+                    {{-- required --}}
+                    autofocus
+                    autocomplete="email"
+                    placeholder="email@example.com"
+                />
+            </div>
+            <div class="col-start-2">
+                <div class="relative">
+                    <flux:input
+                        wire:model="password"
+                        :label="__('Kata sandi')"
+                        type="password"
+                        {{-- required --}}
+                        autocomplete="current-password"
+                        :placeholder="__('Kata sandi')"
+                    />
 
-        <!-- Password -->
-        <div class="relative">
-            <flux:input
-                wire:model="password"
-                :label="__('Kata sandi')"
-                type="password"
-                {{-- required --}}
-                autocomplete="current-password"
-                :placeholder="__('Kata sandi')"
-            />
-
-            @if (Route::has('password.request'))
-                <flux:link class="absolute end-0 top-0 text-sm" :href="route('password.request')" wire:navigate>
-                    {{ __('Lupa kata sandi Anda?') }}
-                </flux:link>
-            @endif
-        </div>
-
-        <!-- Remember Me -->
-        <flux:checkbox wire:model="remember" :label="__('Ingat saya')" />
-
-        <div class="flex items-center justify-end">
-            <flux:button variant="primary" type="submit" class="w-full">{{ __('Masuk') }}</flux:button>
+                    @if (Route::has('password.request'))
+                        <flux:link class="absolute end-0 top-0 text-sm" :href="route('password.request')" wire:navigate>
+                            {{ __('Lupa kata sandi Anda?') }}
+                        </flux:link>
+                    @endif
+                </div>
+            </div>
+            <div class="col-start-2">
+                <div class="grid grid-cols-6 gap-2">
+                    <div class="col-span-6">
+                        <flux:input
+                            :label="__('Masukkan Captcha')"
+                            wire:model.defer="captcha"
+                            type="text"
+                            placeholder="Tulis ulang captcha di bawah"
+                        />
+                    </div>
+                    <div class="col-span-5 border rounded-lg flex items-center justify-center shadow-xs dark:border-white/10 dark:bg-white/10 py-1">
+                        <span>{!! captcha_img() !!}</span>
+                    </div>
+                    <div>
+                        <flux:button wire:click="refreshCaptcha" icon="arrow-path" type="button" class="w-full"></flux:button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-start-2">
+                <div class="grid grid-cols-1 gap-4">
+                    <div>
+                        <flux:checkbox wire:model="remember" :label="__('Ingat saya')" />
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-end">
+                            <flux:button variant="primary" type="submit" class="w-full">{{ __('Masuk') }}</flux:button>
+                        </div>
+                    </div>
+                    <div>
+                        @if (Route::has('register'))
+                            <div class="space-x-1 rtl:space-x-reverse text-center text-sm text-zinc-600 dark:text-zinc-400">
+                                {{ __('Belum punya akun?') }}
+                                <flux:link :href="route('register')" wire:navigate>{{ __('Daftar') }}</flux:link>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
         </div>
     </form>
-
-    @if (Route::has('register'))
-        <div class="space-x-1 rtl:space-x-reverse text-center text-sm text-zinc-600 dark:text-zinc-400">
-            {{ __('Belum punya akun?') }}
-            <flux:link :href="route('register')" wire:navigate>{{ __('Daftar') }}</flux:link>
-        </div>
-    @endif
 </div>

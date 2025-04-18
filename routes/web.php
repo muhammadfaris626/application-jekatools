@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\PaymentCallbackController;
 use App\Livewire\Afiliasi\IndexAfiliasi;
+use App\Livewire\Authentication\Daftar;
 use App\Livewire\DigitalProduct\CheckoutDigitalProduct;
 use App\Livewire\DigitalProduct\CreateDigitalProduct;
 use App\Livewire\DigitalProduct\IndexDigitalProduct;

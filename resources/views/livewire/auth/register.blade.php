@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
+use Mews\Captcha\Facades\Captcha;
 
 new #[Layout('components.layouts.auth')] class extends Component {
     public string $name = '';
@@ -16,28 +17,28 @@ new #[Layout('components.layouts.auth')] class extends Component {
     public string $referral_code = '';
     public string $referred_by = '';
     public string $whatsapp_number = '';
-    public $captcha;
+    public string $captcha = '';
+    public string $captcha_image = '';
 
-    protected $listeners = ['captchaResolved'];
-
-    public function captchaResolved($token)
+    public function mount()
     {
-        $this->captcha = $token;
+        $this->captcha_image = captcha_img();
     }
 
-    /**
-     * Handle an incoming registration request.
-     */
+    public function refreshCaptcha()
+    {
+        $this->captcha_image = captcha_img();
+    }
+
     public function register(): void {
-        $this->captcha = request()->input('g-recaptcha-response');
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'whatsapp_number' => ['required'],
             'password' => ['required', 'min:8', 'string', Rules\Password::defaults()],
             'referral_code' => 'nullable|string|exists:users,referral_code',
-            'referred_by' => '',
-            'captcha' => 'required',
+            'referred_by' => 'nullable|string',
+            'captcha' => 'required|captcha'
         ], [
             'name.required' => 'Kolom nama wajib diisi.',
             'email.required' => 'Kolom email wajib diisi.',
@@ -46,37 +47,17 @@ new #[Layout('components.layouts.auth')] class extends Component {
             'email.email' => 'Harap gunakan format email yang benar.',
             'email.unique' => 'Email sudah terdaftar, harap gunakan email yang berbeda.',
             'password.min' => 'Password minimal harus terdiri dari 8 karakter.',
+            'captcha.captcha' => 'Captcha tidak sesuai.',
             'captcha.required' => 'Captcha wajib diisi.'
         ]);
 
-        if (! $this->verifyCaptcha($this->captcha)) {
-            $this->addError('captcha', 'CAPTCHA tidak valid.');
-            return;
-        }
-
-
         $validated['password'] = Hash::make($validated['password']);
-
         $referrer = User::where('referral_code', $validated['referral_code'])->first();
-
         $validated['referral_code'] = Str::random(8);
         $validated['referred_by'] = $referrer?->referral_code;
-
         event(new Registered(($user = User::create($validated))));
-
         Auth::login($user);
-
         $this->redirectIntended(route('dashboard', absolute: false), navigate: true);
-    }
-
-    private function verifyCaptcha($token)
-    {
-        $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
-            'secret' => config('services.nocaptcha.secret'),
-            'response' => $token,
-        ]);
-
-        return $response->json('success') === true;
     }
 }; ?>
 
@@ -86,62 +67,71 @@ new #[Layout('components.layouts.auth')] class extends Component {
     <!-- Session Status -->
     <x-auth-session-status class="text-center" :status="session('status')" />
 
-    <form wire:submit="register" class="flex flex-col gap-6">
-        <!-- Name -->
-        <flux:input
-            wire:model="name"
-            :label="__('Nama')"
-            type="text"
-            autofocus
-            autocomplete="name"
-            :placeholder="__('Nama lengkap')"
-        />
-
-        <!-- Email Address -->
-        <flux:input
-            wire:model="email"
-            :label="__('Email')"
-            type="email"
-            autocomplete="email"
-            placeholder="email@example.com"
-        />
-
-        <flux:input.group :label="__('Nomor Whatsapp')">
-            <flux:input.group.prefix>+62</flux:input.group.prefix>
-            <flux:input
-                type="text"
-                wire:model="whatsapp_number"
-                placeholder="8xxxxxxxxxx"
-                autocomplete="whatsapp_number" />
-        </flux:input.group>
-
-        <!-- Password -->
-        <flux:input
-            wire:model="password"
-            :label="__('Kata sandi')"
-            type="password"
-            autocomplete="new-password"
-            :placeholder="__('Kata sandi')"
-        />
-
-        <!-- Confirm Password -->
-        <flux:input
-            wire:model="referral_code"
-            :label="__('Kode referal (opsional)')"
-            type="text"
-            autocomplete="off"
-            :placeholder="__('Masukkan kode referal')"
-        />
-
-        <div class="text-center">
-            <div wire:ignore>
-                <div id="recaptcha-container">
-                    {!! NoCaptcha::display(['data-callback' => 'onReCaptchaSuccess']) !!}
+    <form wire:submit="register" class="flex flex-col gap-2">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div>
+                <flux:input
+                    wire:model="name"
+                    :label="__('Nama')"
+                    type="text"
+                    autocomplete="name"
+                    :placeholder="__('Nama lengkap')"
+                />
+            </div>
+            <div>
+                <flux:input
+                    wire:model="email"
+                    :label="__('Email')"
+                    type="email"
+                    autocomplete="email"
+                    placeholder="email@example.com"
+                />
+            </div>
+            <div>
+                <flux:field>
+                    <flux:label>{{ __('Nomor Whatsapp') }}</flux:label>
+                    <flux:input.group>
+                        <flux:input.group.prefix>+62</flux:input.group.prefix>
+                        <flux:input wire:model="whatsapp_number" placeholder="8xxxxxxxxxx" />
+                    </flux:input.group>
+                    <flux:error name="whatsapp_number" />
+                </flux:field>
+            </div>
+            <div>
+                <flux:input
+                    wire:model="password"
+                    :label="__('Kata sandi')"
+                    type="password"
+                    autocomplete="new-password"
+                    :placeholder="__('Kata sandi')"
+                />
+            </div>
+            <div>
+                <flux:input
+                    wire:model="referral_code"
+                    :label="__('Kode referal (opsional)')"
+                    type="text"
+                    autocomplete="off"
+                    :placeholder="__('Masukkan kode referal')"
+                />
+            </div>
+            <div class="grid grid-cols-9 gap-2">
+                <div class="col-span-9">
+                    <flux:input
+                        :label="__('Masukkan Captcha')"
+                        wire:model.defer="captcha"
+                        type="text"
+                        placeholder="Tulis ulang captcha di bawah"
+                    />
+                </div>
+                <div class="col-span-8 border rounded-lg flex items-center justify-center shadow-xs dark:border-white/10 dark:bg-white/10 py-1">
+                    <span>{!! captcha_img() !!}</span>
+                </div>
+                <div>
+                    <flux:button wire:click="refreshCaptcha" icon="arrow-path" type="button" class="w-full"></flux:button>
                 </div>
             </div>
-            <flux:error name="captcha" />
         </div>
-
         <div class="flex items-center justify-end">
             <flux:button type="submit" variant="primary" class="w-full">
                 {{ __('Daftar') }}
@@ -154,11 +144,3 @@ new #[Layout('components.layouts.auth')] class extends Component {
         <flux:link :href="route('login')" wire:navigate>{{ __('Masuk') }}</flux:link>
     </div>
 </div>
-@push('scripts')
-    {!! NoCaptcha::renderJs() !!}
-    <script>
-        function onCaptchaSuccess(token) {
-            Livewire.emit('captchaResolved', token);
-        }
-    </script>
-@endpush
