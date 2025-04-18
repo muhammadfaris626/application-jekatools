@@ -22,10 +22,10 @@ class ComposerStaticInit9929ae0f39b99702c171f9c9695fdcb9
         'ec07570ca5a812141189b1fa81503674' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Assert/Functions.php',
         '47e1160838b5e5a10346ac4084b58c23' => __DIR__ . '/..' . '/laravel/prompts/src/helpers.php',
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
+        '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
         '2203a247e6fda86070a5e4e07aed533a' => __DIR__ . '/..' . '/symfony/clock/Resources/now.php',
         '09f6b20656683369174dd6fa83b7e5fb' => __DIR__ . '/..' . '/symfony/polyfill-uuid/bootstrap.php',
         'a1105708a18b76903365ca1c4aa61b02' => __DIR__ . '/..' . '/symfony/translation/Resources/functions.php',
-        '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
         '40275907c8566c390185147049ef6e5d' => __DIR__ . '/..' . '/livewire/livewire/src/helpers.php',
         'e39a8b23c42d4e1452234d762b03835a' => __DIR__ . '/..' . '/ramsey/uuid/src/functions.php',
         '476ca15b8d69b04665cd879be9cb4c68' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Collections/functions.php',
@@ -206,6 +206,7 @@ class ComposerStaticInit9929ae0f39b99702c171f9c9695fdcb9
         'A' => 
         array (
             'App\\' => 4,
+            'Anhskohbo\\NoCaptcha\\' => 20,
         ),
     );
 
@@ -623,9 +624,16 @@ class ComposerStaticInit9929ae0f39b99702c171f9c9695fdcb9
             0 => __DIR__ . '/../..' . '/app',
             1 => __DIR__ . '/..' . '/laravel/pint/app',
         ),
+        'Anhskohbo\\NoCaptcha\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/anhskohbo/no-captcha/src',
+        ),
     );
 
     public static $classMap = array (
+        'Anhskohbo\\NoCaptcha\\Facades\\NoCaptcha' => __DIR__ . '/..' . '/anhskohbo/no-captcha/src/Facades/NoCaptcha.php',
+        'Anhskohbo\\NoCaptcha\\NoCaptcha' => __DIR__ . '/..' . '/anhskohbo/no-captcha/src/NoCaptcha.php',
+        'Anhskohbo\\NoCaptcha\\NoCaptchaServiceProvider' => __DIR__ . '/..' . '/anhskohbo/no-captcha/src/NoCaptchaServiceProvider.php',
         'App\\Http\\Controllers\\Auth\\VerifyEmailController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/VerifyEmailController.php',
         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',
         'App\\Http\\Controllers\\PaymentCallbackController' => __DIR__ . '/../..' . '/app/Http/Controllers/PaymentCallbackController.php',
@@ -633,12 +641,18 @@ class ComposerStaticInit9929ae0f39b99702c171f9c9695fdcb9
         'App\\Http\\Requests\\ProductRequest' => __DIR__ . '/../..' . '/app/Http/Requests/ProductRequest.php',
         'App\\Http\\Requests\\SubscriptionRequest' => __DIR__ . '/../..' . '/app/Http/Requests/SubscriptionRequest.php',
         'App\\Livewire\\Actions\\Logout' => __DIR__ . '/../..' . '/app/Livewire/Actions/Logout.php',
+        'App\\Livewire\\Afiliasi\\IndexAfiliasi' => __DIR__ . '/../..' . '/app/Livewire/Afiliasi/IndexAfiliasi.php',
         'App\\Livewire\\DigitalProduct\\CheckoutDigitalProduct' => __DIR__ . '/../..' . '/app/Livewire/DigitalProduct/CheckoutDigitalProduct.php',
         'App\\Livewire\\DigitalProduct\\CreateDigitalProduct' => __DIR__ . '/../..' . '/app/Livewire/DigitalProduct/CreateDigitalProduct.php',
         'App\\Livewire\\DigitalProduct\\IndexDigitalProduct' => __DIR__ . '/../..' . '/app/Livewire/DigitalProduct/IndexDigitalProduct.php',
+        'App\\Livewire\\DigitalProduct\\InvoiceDigitalProduct' => __DIR__ . '/../..' . '/app/Livewire/DigitalProduct/InvoiceDigitalProduct.php',
         'App\\Livewire\\DigitalProduct\\ReadDigitalProduct' => __DIR__ . '/../..' . '/app/Livewire/DigitalProduct/ReadDigitalProduct.php',
         'App\\Livewire\\DigitalProduct\\TransactionDigitalProduct' => __DIR__ . '/../..' . '/app/Livewire/DigitalProduct/TransactionDigitalProduct.php',
         'App\\Livewire\\DigitalProduct\\UpdateDigitalProduct' => __DIR__ . '/../..' . '/app/Livewire/DigitalProduct/UpdateDigitalProduct.php',
+        'App\\Livewire\\Member\\CreateMember' => __DIR__ . '/../..' . '/app/Livewire/Member/CreateMember.php',
+        'App\\Livewire\\Member\\IndexMember' => __DIR__ . '/../..' . '/app/Livewire/Member/IndexMember.php',
+        'App\\Livewire\\Member\\ReadMember' => __DIR__ . '/../..' . '/app/Livewire/Member/ReadMember.php',
+        'App\\Livewire\\Member\\UpdateMember' => __DIR__ . '/../..' . '/app/Livewire/Member/UpdateMember.php',
         'App\\Livewire\\Plan\\CreatePlan' => __DIR__ . '/../..' . '/app/Livewire/Plan/CreatePlan.php',
         'App\\Livewire\\Plan\\IndexPlan' => __DIR__ . '/../..' . '/app/Livewire/Plan/IndexPlan.php',
         'App\\Livewire\\Plan\\ReadPlan' => __DIR__ . '/../..' . '/app/Livewire/Plan/ReadPlan.php',
@@ -651,9 +665,11 @@ class ComposerStaticInit9929ae0f39b99702c171f9c9695fdcb9
         'App\\Livewire\\Subscription\\IndexSubscription' => __DIR__ . '/../..' . '/app/Livewire/Subscription/IndexSubscription.php',
         'App\\Livewire\\Subscription\\ReadSubscription' => __DIR__ . '/../..' . '/app/Livewire/Subscription/ReadSubscription.php',
         'App\\Livewire\\Subscription\\UpdateSubscription' => __DIR__ . '/../..' . '/app/Livewire/Subscription/UpdateSubscription.php',
+        'App\\Livewire\\Transaksi\\IndexTransaksi' => __DIR__ . '/../..' . '/app/Livewire/Transaksi/IndexTransaksi.php',
         'App\\Models\\ListPlanFeature' => __DIR__ . '/../..' . '/app/Models/ListPlanFeature.php',
         'App\\Models\\Plan' => __DIR__ . '/../..' . '/app/Models/Plan.php',
         'App\\Models\\Product' => __DIR__ . '/../..' . '/app/Models/Product.php',
+        'App\\Models\\ReferralBonus' => __DIR__ . '/../..' . '/app/Models/ReferralBonus.php',
         'App\\Models\\Subscription' => __DIR__ . '/../..' . '/app/Models/Subscription.php',
         'App\\Models\\Transaction' => __DIR__ . '/../..' . '/app/Models/Transaction.php',
         'App\\Models\\User' => __DIR__ . '/../..' . '/app/Models/User.php',

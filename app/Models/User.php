@@ -24,7 +24,8 @@ class User extends Authenticatable
         'email',
         'password',
         'referral_code',
-        'referred_by'
+        'referred_by',
+        'whatsapp_number'
     ];
 
     /**

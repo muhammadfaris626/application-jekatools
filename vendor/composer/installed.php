@@ -1,15 +1,24 @@
 <?php return array(
     'root' => array(
         'name' => 'laravel/livewire-starter-kit',
-        'pretty_version' => '1.0.0+no-version-set',
-        'version' => '1.0.0.0',
-        'reference' => null,
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
+        'reference' => '53a4b6cf42399afb16d98690c8e783a7028ca903',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
         'dev' => true,
     ),
     'versions' => array(
+        'anhskohbo/no-captcha' => array(
+            'pretty_version' => '3.7.0',
+            'version' => '3.7.0.0',
+            'reference' => '87666572f0dbe1e3380a2e9ae7574bf3a2d0804e',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../anhskohbo/no-captcha',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'barryvdh/laravel-debugbar' => array(
             'pretty_version' => 'v3.15.3',
             'version' => '3.15.3.0',
@@ -440,9 +449,9 @@
             'dev_requirement' => false,
         ),
         'laravel/livewire-starter-kit' => array(
-            'pretty_version' => '1.0.0+no-version-set',
-            'version' => '1.0.0.0',
-            'reference' => null,
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
+            'reference' => '53a4b6cf42399afb16d98690c8e783a7028ca903',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

@@ -92,6 +92,7 @@ class PaymentCallbackController extends Controller
                         'referred_user_id' => $transaction->user_id,
                         'amount' => $transaction->amount * 0.10
                     ]);
+                    dd(1);
 
                     break;
 

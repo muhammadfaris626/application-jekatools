@@ -15,20 +15,44 @@ new #[Layout('components.layouts.auth')] class extends Component {
     public string $password_confirmation = '';
     public string $referral_code = '';
     public string $referred_by = '';
+    public string $whatsapp_number = '';
+    public $captcha;
+
+    protected $listeners = ['captchaResolved'];
+
+    public function captchaResolved($token)
+    {
+        $this->captcha = $token;
+    }
 
     /**
      * Handle an incoming registration request.
      */
-    public function register(): void
-    {
-
+    public function register(): void {
+        $this->captcha = request()->input('g-recaptcha-response');
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
-            'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
+            'whatsapp_number' => ['required'],
+            'password' => ['required', 'min:8', 'string', Rules\Password::defaults()],
             'referral_code' => 'nullable|string|exists:users,referral_code',
             'referred_by' => '',
+            'captcha' => 'required',
+        ], [
+            'name.required' => 'Kolom nama wajib diisi.',
+            'email.required' => 'Kolom email wajib diisi.',
+            'whatsapp_number.required' => 'Kolom nomor whatsapp wajib diisi.',
+            'password.required' => 'Kolom kata sandi wajib diisi.',
+            'email.email' => 'Harap gunakan format email yang benar.',
+            'email.unique' => 'Email sudah terdaftar, harap gunakan email yang berbeda.',
+            'password.min' => 'Password minimal harus terdiri dari 8 karakter.',
+            'captcha.required' => 'Captcha wajib diisi.'
         ]);
+
+        if (! $this->verifyCaptcha($this->captcha)) {
+            $this->addError('captcha', 'CAPTCHA tidak valid.');
+            return;
+        }
 
 
         $validated['password'] = Hash::make($validated['password']);
@@ -44,10 +68,20 @@ new #[Layout('components.layouts.auth')] class extends Component {
 
         $this->redirectIntended(route('dashboard', absolute: false), navigate: true);
     }
+
+    private function verifyCaptcha($token)
+    {
+        $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+            'secret' => config('services.nocaptcha.secret'),
+            'response' => $token,
+        ]);
+
+        return $response->json('success') === true;
+    }
 }; ?>
 
 <div class="flex flex-col gap-6">
-    <x-auth-header :title="__('Create an account')" :description="__('Enter your details below to create your account')" />
+    <x-auth-header :title="__('Buat akun')" :description="__('Masukkan detail di bawah ini untuk membuat akun Anda')" />
 
     <!-- Session Status -->
     <x-auth-session-status class="text-center" :status="session('status')" />
@@ -56,60 +90,75 @@ new #[Layout('components.layouts.auth')] class extends Component {
         <!-- Name -->
         <flux:input
             wire:model="name"
-            :label="__('Name')"
+            :label="__('Nama')"
             type="text"
-            required
             autofocus
             autocomplete="name"
-            :placeholder="__('Full name')"
+            :placeholder="__('Nama lengkap')"
         />
 
         <!-- Email Address -->
         <flux:input
             wire:model="email"
-            :label="__('Email address')"
+            :label="__('Email')"
             type="email"
-            required
             autocomplete="email"
             placeholder="email@example.com"
         />
 
+        <flux:input.group :label="__('Nomor Whatsapp')">
+            <flux:input.group.prefix>+62</flux:input.group.prefix>
+            <flux:input
+                type="text"
+                wire:model="whatsapp_number"
+                placeholder="8xxxxxxxxxx"
+                autocomplete="whatsapp_number" />
+        </flux:input.group>
+
         <!-- Password -->
         <flux:input
             wire:model="password"
-            :label="__('Password')"
+            :label="__('Kata sandi')"
             type="password"
-            required
             autocomplete="new-password"
-            :placeholder="__('Password')"
+            :placeholder="__('Kata sandi')"
         />
 
         <!-- Confirm Password -->
         <flux:input
-            wire:model="password_confirmation"
-            :label="__('Confirm password')"
-            type="password"
-            required
-            autocomplete="new-password"
-            :placeholder="__('Confirm password')"
-        />
-        <flux:input
             wire:model="referral_code"
-            :label="__('Referral code (optional)')"
+            :label="__('Kode referal (opsional)')"
             type="text"
             autocomplete="off"
-            :placeholder="__('Enter referral code')"
+            :placeholder="__('Masukkan kode referal')"
         />
+
+        <div class="text-center">
+            <div wire:ignore>
+                <div id="recaptcha-container">
+                    {!! NoCaptcha::display(['data-callback' => 'onReCaptchaSuccess']) !!}
+                </div>
+            </div>
+            <flux:error name="captcha" />
+        </div>
 
         <div class="flex items-center justify-end">
             <flux:button type="submit" variant="primary" class="w-full">
-                {{ __('Create account') }}
+                {{ __('Daftar') }}
             </flux:button>
         </div>
     </form>
 
     <div class="space-x-1 rtl:space-x-reverse text-center text-sm text-zinc-600 dark:text-zinc-400">
-        {{ __('Already have an account?') }}
-        <flux:link :href="route('login')" wire:navigate>{{ __('Log in') }}</flux:link>
+        {{ __('Sudah punya akun?') }}
+        <flux:link :href="route('login')" wire:navigate>{{ __('Masuk') }}</flux:link>
     </div>
 </div>
+@push('scripts')
+    {!! NoCaptcha::renderJs() !!}
+    <script>
+        function onCaptchaSuccess(token) {
+            Livewire.emit('captchaResolved', token);
+        }
+    </script>
+@endpush
