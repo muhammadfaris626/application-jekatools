@@ -121,7 +121,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
                         :label="__('Masukkan Captcha')"
                         wire:model.defer="captcha"
                         type="text"
-                        placeholder="Tulis ulang captcha di bawah"
+                        placeholder="Masukkan hasil captcha dibawah"
                     />
                 </div>
                 <div class="col-span-8 border rounded-lg flex items-center justify-center shadow-xs dark:border-white/10 dark:bg-white/10 py-1">
