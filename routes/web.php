@@ -3,6 +3,7 @@
 use App\Http\Controllers\PaymentCallbackController;
 use App\Livewire\Afiliasi\IndexAfiliasi;
 use App\Livewire\Authentication\Daftar;
+use App\Livewire\Dashboard\IndexDashboard;
 use App\Livewire\DigitalProduct\CheckoutDigitalProduct;
 use App\Livewire\DigitalProduct\CreateDigitalProduct;
 use App\Livewire\DigitalProduct\IndexDigitalProduct;
@@ -18,15 +19,10 @@ use App\Livewire\Transaksi\IndexTransaksi;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
-Route::get('/', function () {
-    return view('dashboard');
-})->name('home')->middleware('auth');
-
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
-
 Route::middleware(['auth'])->group(function () {
+    Route::get('/', IndexDashboard::class)->name('home');
+    Route::get('dashboard', IndexDashboard::class)->name('dashboard');
+
     foreach (glob(__DIR__ . '/partials/*.php') as $file) {
         require $file;
     }

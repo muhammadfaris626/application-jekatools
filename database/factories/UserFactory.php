@@ -23,12 +23,16 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $referralCode = strtoupper(Str::random(8));
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
-            'remember_token' => Str::random(10),
+            'name'            => $this->faker->name(),
+            'email'           => $this->faker->unique()->safeEmail(),
+            'whatsapp_number' => $this->faker->unique()->phoneNumber(),
+            'password'        => bcrypt('password'), // default password
+            'referral_code'   => $referralCode,
+            'referred_by'     => null, // akan diupdate nanti setelah semua user dibuat
+            'created_at'      => now(),
+            'updated_at'      => now(),
         ];
     }
 
